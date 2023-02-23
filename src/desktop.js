@@ -1,6 +1,12 @@
 
 import * as THREE from "../libs/three.js/build/three.module.js"
 import JSON5 from "../libs/json5-2.1.3/json5.mjs";
+const os = require("os")
+
+const isMac = os.platform() === "darwin";
+const isWindows = os.platform() === "win32";
+const isLinux = os.platform() === "linux";
+const arch = os.arch();
 
 export function loadDroppedPointcloud(cloudjsPath){
 	const folderName = cloudjsPath.replace(/\\/g, "/").split("/").reverse()[1];
@@ -179,7 +185,15 @@ export function convert_20(inputPaths, chosenPath, pointcloudName){
 
 	const { spawn, fork, execFile } = require('child_process');
 
-	let exe = './libs/PotreeConverter2/PotreeConverter.exe';
+	let exe = null;
+	if (isWindows) {
+		exe = './libs/PotreeConverter2/win/PotreeConverter.exe';
+	} if (isMac){
+		if	(arch === 'arm64'){ 
+			exe = './libs/PotreeConverter2/mac/apple/PotreeConverter';
+		}
+	}
+
 	let parameters = [
 		...inputPaths,
 		"-o", chosenPath
